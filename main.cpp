@@ -9,7 +9,7 @@ using namespace std;
 int lcg() {
 	static size_t x = 0;
 	x = (1021 * x + 24631) % 116640;
-	return static_cast<int>(x); //cast because W4
+	return static_cast<int>(x);
 }
 
 void test_fill(int N) {
@@ -74,7 +74,7 @@ void test_search(int N) {
 	start = chrono::high_resolution_clock::now();
 	for (int i = 0; i < attempts; ++i) {
 		int value = lcg();
-		(void)find(v.begin(), v.end(), value); //(void) W4
+		(void)find(v.begin(), v.end(), value);
 	}
 	end = chrono::high_resolution_clock::now();
 	time_vector += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
@@ -132,7 +132,7 @@ void test_remove_add(int N) {
 bool is_subset(const Set& set1, const Set& set2) {
 	std::vector<int> subset = set1.to_vector();
 
-	for (int key : subset) { //Range-based
+	for (int key : subset) {
 		if (!set2.contains(key)) {
 			return false;
 		}
@@ -147,9 +147,11 @@ bool is_any_subset(const Set& set1, const Set& set2) {
 
 int main() {
 
-	test_fill(100000);
-	test_search(1000);
-	test_remove_add(10000);
+	for (int n : {1000, 10000, 100000}) {
+		test_fill(n);
+		test_search(n);
+		test_remove_add(n);
+	}
 
 	Set s1;
 	s1.insert(1);
