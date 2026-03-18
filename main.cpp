@@ -43,9 +43,9 @@ void test_fill(int N) {
 		time_vector += chrono::duration_cast<chrono::microseconds>(end - start).count();
 	}
 
-	cout << "Fill " << N << " with " << attempts << " attempts.\n";
-	cout << "Set " << time_set / attempts << " microseconds.\n";
-	cout << "Vector " << time_vector / attempts << " microseconds.\n";
+	cout << "Fill " << N << " elements with " << attempts << " attempts.\n";
+	cout << "Set:    " << time_set / attempts << " microseconds.\n";
+	cout << "Vector: " << time_vector / attempts << " microseconds.\n\n";
 }
 
 void test_search(int N) {
@@ -79,9 +79,9 @@ void test_search(int N) {
 	end = chrono::high_resolution_clock::now();
 	time_vector += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
 
-	cout << "Search in " << N << " elements with " << attempts << " attempts.\n";
-	cout << "Set " << time_set / attempts << " nanoseconds.\n";
-	cout << "Vector " << time_vector / attempts << " nanoseconds.\n";
+	cout << "Searched in " << N << " elements with " << attempts << " attempts.\n";
+	cout << "Set:    " << time_set / attempts << " nanoseconds.\n";
+	cout << "Vector: " << time_vector / attempts << " nanoseconds.\n\n";
 }
 
 void test_remove_add(int N) {
@@ -106,7 +106,7 @@ void test_remove_add(int N) {
 		s.erase(lcg());
 	}
 	auto end = chrono::high_resolution_clock::now();
-	time_set += chrono::duration_cast<chrono::microseconds>(end - start).count();
+	time_set += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
 
 	start = chrono::high_resolution_clock::now();
 	for (int i = 0; i < attempts; ++i) {
@@ -122,11 +122,11 @@ void test_remove_add(int N) {
 		}
 	}
 	end = chrono::high_resolution_clock::now();
-	time_vector += chrono::duration_cast<chrono::microseconds>(end - start).count();
+	time_vector += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
 
 	cout << "Add/remove in " << N << " elements with " << attempts << " attempts.\n";
-	cout << "Set " << time_set / attempts << " microseconds.\n";
-	cout << "Vector " << time_vector / attempts << " microseconds.\n";
+	cout << "Set:    " << time_set / attempts << " nanoseconds.\n";
+	cout << "Vector: " << time_vector / attempts << " nanoseconds.\n\n";
 }
 
 bool is_subset(const Set& set1, const Set& set2) {
