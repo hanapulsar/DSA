@@ -2,6 +2,7 @@
 #define SET_H
 
 #include <iostream>
+#include <vector>
 
 class Set {
 private:
@@ -22,6 +23,8 @@ private:
 	Node* insert_node(Node* node, int key, bool& inserted);
 	bool contains_node(const Node* node, int key) const;
 	Node* erase_node(Node* node, int key, bool& erased);
+	Node* find_min(Node* node) const;
+	Node* remove_min(Node* node);
 	bool check_strictly_balanced(const Node* node) const;
 
 	Node* balance(Node* node);
@@ -30,6 +33,8 @@ private:
 	int get_height_difference(const Node* node) const;
 	Node* rotate_right(Node* node);
 	Node* rotate_left(Node* node);
+
+	void tree_to_vector(const Node* node, std::vector<int>& vec) const;
 
 public:
 	Set();
@@ -41,6 +46,7 @@ public:
 	bool contains(int key) const;
 	bool erase(int key);
 	bool strictly_balanced() const;
+	std::vector<int> to_vector() const;
 };
 
 //Constructor
@@ -95,7 +101,7 @@ bool Set::erase(int key) {
 bool Set::strictly_balanced() const {
 	return check_strictly_balanced(root);
 }
- 
+
 //Delete tree
 void Set::delete_tree(Node* node) {
 	if (node != nullptr) {
@@ -153,7 +159,51 @@ bool Set::contains_node(const Node* node, int key) const {
 
 //Erase node
 Set::Node* Set::erase_node(Node* node, int key, bool& erased) {
-	// TODO
+	if (node == nullptr) {
+		erased = false;
+		return nullptr;
+	}
+
+	if (key < node->key) {
+		node->left = erase_node(node->left, key, erased);
+	}
+	else if (key > node->key) {
+		node->right = erase_node(node->right, key, erased);
+	}
+	else {
+		erased = true;
+		Node* left_node = node->left;
+		Node* right_node = node->right;
+
+		delete node;
+
+		if (right_node == nullptr) {
+			return left_node;
+		}
+
+		Node* min_node = find_min(right_node); //minimal value in right node would become new root
+		min_node->right = remove_min(right_node); //add to right everything except new root
+		min_node->left = left_node; 
+
+		return balance(min_node);
+	}
+
+	return balance(node);
+}
+
+//Find minimum node
+Set::Node* Set::find_min(Node* node) const {
+	if (node->left != nullptr) {
+		return find_min(node->left);
+	}
+	return node;
+}
+
+//Remove minimum node
+Set::Node* Set::remove_min(Node* node) {
+	if (node->left == nullptr) return node->right; //will be true when we reach our minimum, return to not lose what from right of minimum
+	node->left = remove_min(node->left);
+	return balance(node); //start balancing after reached minimum, going back up
 }
 
 //Check if strictly balanced
@@ -224,6 +274,21 @@ Set::Node* Set::rotate_left(Node* node) {
 	set_height(node);
 	set_height(q);
 	return q;
+}
+
+//Convert tree to vector
+std::vector<int> Set::to_vector() const {
+	std::vector<int> vec;
+	tree_to_vector(root, vec);
+	return vec;
+}
+
+void Set::tree_to_vector(const Node* node, std::vector<int>& vec) const {
+	if (node != nullptr) {
+		tree_to_vector(node->left, vec);
+		vec.push_back(node->key);
+		tree_to_vector(node->right, vec);
+	}
 }
 
 #endif // !SET_H
