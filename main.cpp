@@ -1,7 +1,7 @@
 #include <iostream>
 #include "HashTable.h"
 
-int lenght(const char* str) {
+int length(const char* str) {
 	int len = 0;
 	while (str[len] != '\0') {
 		len++;
@@ -33,7 +33,7 @@ int roman_to_arabic(const char* string) {
 
 	int total = 0;
 	int prev_val = 0;
-	int str_len = lenght(string);
+	int str_len = length(string);
 
 	for (int i = str_len - 1; i >= 0; --i) {
 		char curr_char = string[i];
