@@ -55,14 +55,48 @@ int roman_to_arabic(const char* string) {
 }
 
 int main() {
+	std::cout << "Test 1: Basic Operations\n";
+	HashTable<int> table(8);
+	table.insert(10, 100);
+	table.insert(20, 200);
+	table.insert(30, 300);
+	table.print();
+
+	std::cout << "\nTest 2: Search and Assign\n";
+	int* found = table.search(20);
+	if (found) std::cout << "Found key 20, value: " << *found << "\n";
+
+	table.insert_or_assign(20, 999);
+	std::cout << "After assigning 999 to key 20:\n";
+	table.print();
+
+	std::cout << "\nTest 3: Erase and Linear Probing\n";
+	table.erase(20);
+	std::cout << "After erasing key 20:\n";
+	table.print();
+
+	int* search_after_delete = table.search(30);
+	if (search_after_delete) {
+		std::cout << "Key 30 still reachable after erasing 20: " << *search_after_delete << "\n";
+	}
+
+	std::cout << "\nTest 4: Copying\n";
+	HashTable<int> copied_table = table;
+	std::cout << "Copied table contents:\n";
+	copied_table.print();
+
+	std::cout << "\nTest 5: Collision Count\n";
+	std::cout << "Elements with same hash as key 30: " << table.count(30) << "\n";
+
+	std::cout << "\nTest 6: Random (5)\n";
 	HashTable<int> test_table(5, true);
 	std::cout << "Random table:\n";
 	test_table.print();
 	std::cout << "\n";
 
+	std::cout << "\nTest 7: Roman to Arabic\n";
 	const char* roman1 = "MCMXCIV";
 	const char* roman2 = "LVIII";
-
 	std::cout << "Roman: " << roman1 << " is Arabic: " << roman_to_arabic(roman1) << "\n";
 	std::cout << "Roman: " << roman2 << " is Arabic: " << roman_to_arabic(roman2) << "\n";
 
