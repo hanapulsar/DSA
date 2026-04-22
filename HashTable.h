@@ -36,6 +36,10 @@ public:
 	void print() const;
 	bool insert(int key, const T& value);
 	void insert_or_assign(int key, const T& value);
+	bool contains(const T& value);
+	T* search(int key);
+	bool erase(int key);
+	int count(int key);
 };
 
 template <typename T>
@@ -52,7 +56,7 @@ int HashTable<T>::calculate_l(int size) {
 		n *= 2;
 		power++;
 	}
-	return power;
+	return (power < 1) ? 1 : power;
 }
 
 template <typename T>
@@ -91,7 +95,7 @@ void HashTable<T>::resize() {
 
 template <typename T>
 HashTable<T>::HashTable(int size) {
-	a = 3;
+	a = 2654435769U;
 	table_size = 0;
 	l = calculate_l(size);
 	table_capacity = calculate_capacity(l);
@@ -100,7 +104,7 @@ HashTable<T>::HashTable(int size) {
 
 template <typename T>
 HashTable<T>::HashTable(int size, bool random) {
-	a = 3;
+	a = 2654435769U;
 	table_size = 0;
 	l = calculate_l(size);
 	table_capacity = calculate_capacity(l);
@@ -162,7 +166,7 @@ template <typename T>
 void HashTable<T>::print() const {
 	for (int i = 0; i < table_capacity; ++i) {
 		if (table[i].status == OCCUPIED) {
-			std::cout << "[" << i << "] Key: " << table[i].key << " Value: " << table[i].value << std::endl;
+			std::cout << "[" << i << "] Key: " << table[i].key << " Value: " << table[i].value << "\n";
 		}
 	}
 }
@@ -205,6 +209,61 @@ void HashTable<T>::insert_or_assign(int key, const T& value) {
 		if (index == start_index) break;
 	}
 	insert(key, value);
+}
+
+template <typename T>
+bool HashTable<T>::contains(const T& value) {
+	for (int i = 0; i < table_capacity; ++i) {
+		if (table[i].status == OCCUPIED && table[i].value == value) {
+			return true;
+		}
+	}
+	return false;
+}
+
+template <typename T>
+T* HashTable<T>::search(int key) {
+	int index = hash_function(key);
+	int start_index = index;
+
+	while (table[index].status != EMPTY) {
+		if (table[index].status == OCCUPIED && table[index].key == key) {
+			return &(table[index].value);
+		}
+		index = (index + 1) % table_capacity;
+		if (index == start_index) break;
+	}
+	return nullptr;
+}
+
+template <typename T>
+bool HashTable<T>::erase(int key) {
+	int index = hash_function(key);
+	int start_index = index;
+
+	while (table[index].status != EMPTY) {
+		if (table[index].status == OCCUPIED && table[index].key == key) {
+			table[index].status = DELETED;
+			table_size--;
+			return true;
+		}
+		index = (index + 1) % table_capacity;
+		if (index == start_index) break;
+	}
+	return false;
+}
+
+template <typename T>
+int HashTable<T>::count(int key) {
+	int index = hash_function(key);
+	int matches = 0;
+
+	for (int i = 0; i < table_capacity; ++i) {
+		if (table[i].status == OCCUPIED && hash_function(table[i].key) == index) {
+			matches++;
+		}
+	}
+	return matches;
 }
 
 #endif
