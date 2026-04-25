@@ -31,6 +31,10 @@ public:
 	bool has_edge(const Vertex& from, const Vertex& to) const;
 	bool has_edge(const Edge& e) const;
 	std::vector<Edge> edges(const Vertex& vertex);
+
+	size_t order() const;
+	size_t degree(const Vertex& v) const;
+	bool is_connected() const;
 };
 
 template<typename Vertex, typename Distance>
@@ -169,6 +173,34 @@ std::vector<typename Graph<Vertex, Distance>::Edge> Graph<Vertex, Distance>::edg
 	}
 
 	return result;
+}
+
+template<typename Vertex, typename Distance>
+size_t Graph<Vertex, Distance>::order() const {
+	return _vertices.size();
+}
+
+template<typename Vertex, typename Distance>
+size_t Graph<Vertex, Distance>::degree(const Vertex& v) const {
+	long long idx = get_vertex_index(v);
+	if (idx == -1) return 0;
+
+	size_t count = 0;
+
+	for (const auto& edges : _matrix[idx]) {
+		count += edges.size();
+	}
+
+	for (const auto& rows : _matrix) {
+		count += rows[idx].size();
+	}
+
+	return count;
+}
+
+template<typename Vertex, typename Distance>
+bool Graph<Vertex, Distance>::is_connected() const {
+	//TODO need BFS
 }
 
 #endif // GRAPH_H
