@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <limits>
 
 template<typename Vertex, typename Distance = double>
 class Graph {
@@ -216,7 +217,52 @@ bool Graph<Vertex, Distance>::is_connected() const {
 
 template<typename Vertex, typename Distance>
 std::vector<typename Graph<Vertex, Distance>::Edge> Graph<Vertex, Distance>::shortest_path(const Vertex& from, const Vertex& to) const {
-	//TODO
+	std::vector<Edge> path;
+
+	long long start_idx = get_vertex_index(from);
+	long long finish_idx = get_vertex_index(to);
+
+	if (start_idx == -1 || finish_idx == -1) return path;
+
+	size_t n = _vertices.size();
+	Distance infinity = std::numeric_limits<Distance>::max();
+
+	std::vector<Distance> distances(n, infinity);
+	distances[start_idx] = 0;
+
+	std::vector<Edge> prev_edge(n);
+
+	for (size_t i = 0; i < n - 1; ++i) {
+		bool is_updated = false;
+
+		for (size_t u = 0; u < n; ++u) {
+			if (distances[u] == infinity) continue;
+			
+			for (size_t v = 0; v < n; ++v) {
+				for (const auto& edge : _matrix[u][v]) {
+					if (distances[v] > edge.distance + distances[u]) {
+						distances[v] = edge.distance + distances[u];
+						prev_edge[v] = edge;
+						is_updated = true;
+					}
+				}
+			}
+		}
+
+		if (!is_updated) break;
+	}
+
+	if (distances[finish_idx] == infinity) return path;
+
+	size_t current = finish_idx;
+	while (current != start_idx) {
+		path.push_back(prev_edge[current]);
+		current = get_vertex_index(prev_edge[current].from);
+	}
+
+	std::reverse(path.begin(), path.end());
+
+	return path;
 }
 
 template<typename Vertex, typename Distance>
@@ -242,7 +288,7 @@ std::vector<Vertex> Graph<Vertex, Distance>::walk(const Vertex& start_vertex, st
 		action(current_vertex);
 		result.push_back(current_vertex);
 
-		for (size_t neighbor_idx = 0; neighbor_idx < _vertices.size; ++neighbor_idx) {
+		for (size_t neighbor_idx = 0; neighbor_idx < _vertices.size(); ++neighbor_idx) {
 			if (!_matrix[current_idx][neighbor_idx].empty() && !visited[neighbor_idx]) {
 				visited[neighbor_idx] = true;
 				queue.push_back(neighbor_idx);
