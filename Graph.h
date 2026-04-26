@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <functional>
 
 template<typename Vertex, typename Distance = double>
 class Graph {
@@ -35,6 +36,9 @@ public:
 	size_t order() const;
 	size_t degree(const Vertex& v) const;
 	bool is_connected() const;
+
+	std::vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const;
+	std::vector<Vertex> walk(const Vertex& start_vertex, std::function<void(const Vertex&)> action) const;
 };
 
 template<typename Vertex, typename Distance>
@@ -200,7 +204,53 @@ size_t Graph<Vertex, Distance>::degree(const Vertex& v) const {
 
 template<typename Vertex, typename Distance>
 bool Graph<Vertex, Distance>::is_connected() const {
-	//TODO need BFS
+	if (_vertices.empty()) return true;
+
+	for (const auto& v : _vertices) {
+		std::vector<Vertex> reached = walk(v, [](const Vertex&) {});
+		if (reached.size() < _vertices.size()) return false;
+	}
+
+	return true;
+}
+
+template<typename Vertex, typename Distance>
+std::vector<typename Graph<Vertex, Distance>::Edge> Graph<Vertex, Distance>::shortest_path(const Vertex& from, const Vertex& to) const {
+	//TODO
+}
+
+template<typename Vertex, typename Distance>
+std::vector<Vertex> Graph<Vertex, Distance>::walk(const Vertex& start_vertex, std::function<void(const Vertex&)> action) const {
+	std::vector<Vertex> result;
+	long long start_idx = get_vertex_index(start_vertex);
+
+	if (start_idx == -1) return result;
+
+	std::vector<bool> visited(_vertices.size(), false);
+	std::vector<size_t> queue;
+
+	queue.push_back(start_idx);
+	visited[start_idx] = true;
+	
+	size_t head = 0;
+
+	while (head < queue.size()) {
+		size_t current_idx = queue[head];
+		head++;
+		const Vertex& current_vertex = _vertices[current_idx];
+
+		action(current_vertex);
+		result.push_back(current_vertex);
+
+		for (size_t neighbor_idx = 0; neighbor_idx < _vertices.size; ++neighbor_idx) {
+			if (!_matrix[current_idx][neighbor_idx].empty() && !visited[neighbor_idx]) {
+				visited[neighbor_idx] = true;
+				queue.push_back(neighbor_idx);
+			}
+		}
+	}
+
+	return result;
 }
 
 #endif // GRAPH_H
