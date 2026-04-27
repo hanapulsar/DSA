@@ -40,6 +40,8 @@ public:
 
 	std::vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const;
 	std::vector<Vertex> walk(const Vertex& start_vertex, std::function<void(const Vertex&)> action) const;
+
+	Distance path_distance(const std::vector<Edge>& path) const;
 };
 
 template<typename Vertex, typename Distance>
@@ -254,7 +256,7 @@ std::vector<typename Graph<Vertex, Distance>::Edge> Graph<Vertex, Distance>::sho
 
 	if (distances[finish_idx] == infinity) return path;
 
-	size_t current = finish_idx;
+	long long current = finish_idx;
 	while (current != start_idx) {
 		path.push_back(prev_edge[current]);
 		current = get_vertex_index(prev_edge[current].from);
@@ -297,6 +299,15 @@ std::vector<Vertex> Graph<Vertex, Distance>::walk(const Vertex& start_vertex, st
 	}
 
 	return result;
+}
+
+template<typename Vertex, typename Distance>
+Distance Graph<Vertex, Distance>::path_distance(const std::vector<Edge>& path) const {
+	Distance distance = 0;
+	for (const Edge& edge : path) {
+		distance += edge.distance;
+	}
+	return distance;
 }
 
 #endif // GRAPH_H

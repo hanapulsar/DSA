@@ -2,6 +2,13 @@
 #include <string>
 #include "Graph.h"
 
+std::string find_optimal(Graph<std::string, double>& g) {
+	std::vector<std::string> points = g.vertices();
+	if (points.empty()) return "";
+
+
+}
+
 int main() {
 	Graph<std::string, double> city;
 
@@ -33,7 +40,7 @@ int main() {
 	std::cout << "\n";
 
 	std::cout << "Graph order: " << city.order() << "\n";
-	std::cout << "Graph degree: " << city.degree("Center") << "\n";
+	std::cout << "Graph degree at center: " << city.degree("Center") << "\n";
 	std::cout << "Is graph connected: " << (city.is_connected() ? "Yes" : "No") << "\n";
 
 	std::cout << "Shortest from West to East: \n";
@@ -41,6 +48,7 @@ int main() {
 	for (const auto& edge : path) {
 		std::cout << edge.from << " -> " << edge.to << " ( distance: " << edge.distance << " )\n";
 	}
+	std::cout << "Total distance of a path: " << city.path_distance(path) << "\n";
 
 	//TODO task
 }
