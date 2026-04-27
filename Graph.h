@@ -66,7 +66,7 @@ bool Graph<Vertex, Distance>::add_vertex(const Vertex& v) {
 
 	_vertices.push_back(v);
 
-	for (auto& row : _matrix) {
+	for (std::vector<std::vector<Edge>>& row : _matrix) {
 		row.push_back(std::vector<Edge>());
 	}
 
@@ -83,7 +83,7 @@ bool Graph<Vertex, Distance>::remove_vertex(const Vertex& v) {
 
 	_matrix.erase(_matrix.begin() + idx);
 
-	for (auto& row : _matrix) {
+	for (std::vector<std::vector<Edge>>& row : _matrix) {
 		row.erase(row.begin() + idx);
 	}
 
