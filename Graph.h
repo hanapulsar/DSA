@@ -5,6 +5,10 @@
 #include <algorithm>
 #include <functional>
 #include <limits>
+#include <fstream>
+#include <cstdlib>
+#include <filesystem>
+#include <string>
 
 template<typename Vertex, typename Distance = double>
 class Graph {
@@ -13,6 +17,9 @@ public:
 		Vertex from;
 		Vertex to;
 		Distance distance;
+
+		Edge() : from(Vertex()), to(Vertex()), distance(Distance()) {}
+		Edge(const Vertex& f, const Vertex& t, const Distance& d) : from(f), to(t), distance(d) {}
 	};
 
 private:
@@ -32,7 +39,7 @@ public:
 	bool remove_edge(const Edge& e);
 	bool has_edge(const Vertex& from, const Vertex& to) const;
 	bool has_edge(const Edge& e) const;
-	std::vector<Edge> edges(const Vertex& vertex);
+	std::vector<Edge> edges(const Vertex& vertex) const;
 
 	size_t order() const;
 	size_t degree(const Vertex& v) const;
@@ -42,6 +49,8 @@ public:
 	std::vector<Vertex> walk(const Vertex& start_vertex, std::function<void(const Vertex&)> action) const;
 
 	Distance path_distance(const std::vector<Edge>& path) const;
+
+	void print() const;
 };
 
 template<typename Vertex, typename Distance>
@@ -104,7 +113,7 @@ void Graph<Vertex, Distance>::add_edge(const Vertex& from, const Vertex& to, con
 
 	if (idx_from == -1 || idx_to == -1) return;
 
-	Edge new_edge = { from, to, d };
+	Edge new_edge(from, to, d);
 	_matrix[idx_from][idx_to].push_back(new_edge);
 }
 
@@ -167,7 +176,7 @@ bool Graph<Vertex, Distance>::has_edge(const Edge& e) const {
 }
 
 template<typename Vertex, typename Distance>
-std::vector<typename Graph<Vertex, Distance>::Edge> Graph<Vertex, Distance>::edges(const Vertex& vertex) {
+std::vector<typename Graph<Vertex, Distance>::Edge> Graph<Vertex, Distance>::edges(const Vertex& vertex) const {
 	std::vector<Edge> result;
 	long long idx = get_vertex_index(vertex);
 
@@ -239,7 +248,7 @@ std::vector<typename Graph<Vertex, Distance>::Edge> Graph<Vertex, Distance>::sho
 
 		for (size_t u = 0; u < n; ++u) {
 			if (distances[u] == infinity) continue;
-			
+
 			for (size_t v = 0; v < n; ++v) {
 				for (const auto& edge : _matrix[u][v]) {
 					if (distances[v] > edge.distance + distances[u]) {
@@ -277,9 +286,9 @@ std::vector<Vertex> Graph<Vertex, Distance>::walk(const Vertex& start_vertex, st
 	std::vector<bool> visited(_vertices.size(), false);
 	std::vector<size_t> queue;
 
-	queue.push_back(start_idx);
-	visited[start_idx] = true;
-	
+	queue.push_back(static_cast<size_t>(start_idx));
+	visited[static_cast<size_t>(start_idx)] = true;
+
 	size_t head = 0;
 
 	while (head < queue.size()) {
@@ -308,6 +317,49 @@ Distance Graph<Vertex, Distance>::path_distance(const std::vector<Edge>& path) c
 		distance += edge.distance;
 	}
 	return distance;
+}
+
+template<typename Vertex, typename Distance>
+void Graph<Vertex, Distance>::print() const {
+	// 1. Сохраняем граф в файл в текущей рабочей директории (папке билда)
+	std::ofstream out("graph_export.txt");
+	if (!out.is_open()) {
+		std::cerr << "Failed to open file for graph export.\n";
+		return;
+	}
+
+	out << "VERTICES\n";
+	for (const auto& v : _vertices) {
+		out << v << "\n";
+	}
+
+	out << "EDGES\n";
+	for (size_t u = 0; u < _matrix.size(); ++u) {
+		for (size_t v = 0; v < _matrix[u].size(); ++v) {
+			for (const auto& edge : _matrix[u][v]) {
+				out << edge.from << ";" << edge.to << ";" << edge.distance << "\n";
+			}
+		}
+	}
+	out.close();
+
+	// 2. Находим путь к скрипту Python
+	// Макрос __FILE__ содержит полный путь к текущему файлу исходного кода (Graph.h)
+	std::filesystem::path header_path = __FILE__;
+	std::filesystem::path source_dir = header_path.parent_path();
+	std::filesystem::path script_path = source_dir / "draw_graph.py";
+
+	// 3. Формируем команду для терминала
+	// Кавычки нужны на случай, если в пути есть пробелы
+	std::string command = "python \"" + script_path.string() + "\"";
+
+	std::cout << "Drawing graph...\n";
+
+	// 4. Запускаем скрипт
+	int result = std::system(command.c_str());
+	if (result != 0) {
+		std::cerr << "Error running Python script. Command was: " << command << "\n";
+	}
 }
 
 #endif // GRAPH_H

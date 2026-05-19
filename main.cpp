@@ -3,9 +3,11 @@
 #include <limits>
 #include "Graph.h"
 
-std::string find_optimal(Graph<std::string, double>& g) {
+std::string find_optimal(const Graph<std::string, double>& g) {
 	std::vector<std::string> points = g.vertices();
 	if (points.empty()) return "";
+
+	if (!g.is_connected()) return "Error: Graph is not connected.";
 
 	std::string best_point = points[0];
 	double min_max_distance = std::numeric_limits<double>::max();
@@ -49,23 +51,24 @@ int main() {
 	city.add_vertex("East");
 	city.add_vertex("West");
 
-	city.add_edge("Center", "North", 10);
-	city.add_edge("Center", "South", 7);
+	city.add_edge("Center", "North", 1);
+	city.add_edge("Center", "South", 13);
 	city.add_edge("South", "South2", 7);
+	city.add_edge("South2", "South", 7);
 	city.add_edge("South2", "South3", 7);
 	city.add_edge("Center", "East", 5);
-	city.add_edge("Center", "West", 8);
+	city.add_edge("Center", "West", 25);
 
 	city.add_edge("North", "Center", 10);
 	city.add_edge("South", "Center", 7);
 	city.add_edge("East", "Center", 5);
 	city.add_edge("West", "Center", 8);
 
-	city.add_edge("North", "East", 20);
+	city.add_edge("North", "East", 10);
 	city.add_edge("East", "South", 6);
-	city.add_edge("South", "West", 11);
-	city.add_edge("West", "North", 3);
-	
+	city.add_edge("South", "West", 9);
+	city.add_edge("West", "North", 7);
+
 	std::cout << "Test has_vertex (center): " << (city.has_vertex("Center") ? "Yes" : "No") << "\n";
 	std::cout << "Test has_vertex (center2): " << (city.has_vertex("Center2") ? "Yes" : "No") << "\n";
 	std::cout << "Test has_vertex (south3): " << (city.has_vertex("South3") ? "Yes" : "No") << "\n";
@@ -98,6 +101,8 @@ int main() {
 	std::cout << "Total distance of a path: " << city.path_distance(path) << "\n\n";
 
 	std::cout << "Optimal point (center): " << find_optimal(city) << "\n";
+
+	city.print();
 
 	//TODO task
 }
